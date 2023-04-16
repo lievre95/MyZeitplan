@@ -8,22 +8,22 @@ import java.util.Date;
 import java.util.Locale;
 
 public class CalendarDay {
-    private Date date;
+    private long dateInMillis;
     private String note;
     private int dayOfMonth;
     private String dayOfWeekString;
 
-    public CalendarDay(Date date) {
-        this.date = date;
+    public CalendarDay(long dateInMillis) {
+        this.dateInMillis = dateInMillis;
         this.note = "";
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
+        calendar.setTimeInMillis(dateInMillis);
         this.dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        this.dayOfWeekString = new SimpleDateFormat("EEEE", Locale.getDefault()).format(date);
+        this.dayOfWeekString = new SimpleDateFormat("EEEE", Locale.getDefault()).format(dateInMillis);
     }
 
-    public Date getDate() {
-        return date;
+    public long getDateInMillis() {
+        return dateInMillis;
     }
 
     public String getNote() {
@@ -41,6 +41,5 @@ public class CalendarDay {
     public String getDayOfWeekString() {
         return dayOfWeekString;
     }
-
 }
 

@@ -68,6 +68,7 @@ public class CalendarAdapter extends BaseAdapter {
             public void onClick(View view) {
                 if (onDayClickListener != null) {
                     onDayClickListener.onDayClick(calendarDay);
+
                 }
             }
         });
