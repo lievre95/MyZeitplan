@@ -16,10 +16,19 @@ import java.util.Locale;
 public class CalendarAdapter extends BaseAdapter {
     private Context context;
     private List<CalendarDay> calendarDays;
+    private OnDayClickListener onDayClickListener;
+
+    public interface OnDayClickListener {
+        void onDayClick(CalendarDay calendarDay);
+    }
 
     public CalendarAdapter(Context context, List<CalendarDay> calendarDays) {
         this.context = context;
         this.calendarDays = calendarDays;
+    }
+
+    public void setOnDayClickListener(OnDayClickListener listener) {
+        this.onDayClickListener = listener;
     }
 
     @Override
@@ -52,6 +61,16 @@ public class CalendarAdapter extends BaseAdapter {
         dayTextView.setText(calendarDay.getDayOfWeekString());
         dateTextView.setText(String.valueOf(calendarDay.getDayOfMonth()));
         noteTextView.setText(calendarDay.getNote());
+
+        // Handle day click event
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (onDayClickListener != null) {
+                    onDayClickListener.onDayClick(calendarDay);
+                }
+            }
+        });
 
         return convertView;
     }

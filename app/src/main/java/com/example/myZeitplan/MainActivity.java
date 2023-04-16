@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,12 +48,11 @@ public class MainActivity extends AppCompatActivity {
         CalendarAdapter calendarAdapter = new CalendarAdapter(this, calendarDays);
         gridView.setAdapter(calendarAdapter);
 
-        // Set the click listener for the GridView cells
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        calendarAdapter.setOnDayClickListener(new CalendarAdapter.OnDayClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CalendarDay calendarDay = calendarDays.get(position);
-                // TODO: Handle the click and add/edit a note for this day
+            public void onDayClick(CalendarDay calendarDay) {
+                // Handle day click event here
+                Toast.makeText(MainActivity.this, "Clicked day " + calendarDay.getDayOfMonth(), Toast.LENGTH_SHORT).show();
             }
         });
     }
