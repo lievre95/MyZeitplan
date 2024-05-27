@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView monthTextView;
     private ArrayList<CalendarDay> calendarDays;
     private NoteDatabaseHelper noteDatabaseHelper;
+    private CalendarAdapter calendarAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,37 +34,18 @@ public class MainActivity extends AppCompatActivity {
         gridView = findViewById(R.id.gridView);
         monthTextView = findViewById(R.id.monthTextView);
 
-        // Set the current month as the title
         String currentMonth = new SimpleDateFormat("MMMM", Locale.getDefault()).format(new Date());
         monthTextView.setText(currentMonth);
 
-        // Populate the calendarDays array with the days of the current month
         calendarDays = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        int month = calendar.get(Calendar.MONTH);
-        while (calendar.get(Calendar.MONTH) == month) {
-            CalendarDay calendarDay = new CalendarDay(calendar.getTimeInMillis());
-            calendarDays.add(calendarDay);
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
+        populateCalendarDays();
 
-        // Load the notes from the database and add them to the calendar days
-        ArrayList<Note> notes = (ArrayList<Note>) noteDatabaseHelper.getAllNotes();
-        for (Note note : notes) {
-            CalendarDay calendarDay = new CalendarDay(note.getTimestamp());
-            calendarDay.setNote(note.getTitle());
-            calendarDays.set(calendarDay.getDayOfMonth() - 1, calendarDay);
-        }
-
-        // Set the adapter for the GridView
-        CalendarAdapter calendarAdapter = new CalendarAdapter(this, calendarDays);
+        calendarAdapter = new CalendarAdapter(this, calendarDays);
         gridView.setAdapter(calendarAdapter);
 
         calendarAdapter.setOnDayClickListener(new CalendarAdapter.OnDayClickListener() {
             @Override
             public void onDayClick(CalendarDay calendarDay) {
-                // Handle day click event here
                 showAddNoteDialog(calendarDay);
             }
         });
@@ -75,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNoteAdded(Note note) {
                 noteDatabaseHelper.addNote(note);
-                updateCalendarView();
+                updateCalendarDay(note);
+                calendarAdapter.notifyDataSetChanged();
             }
         });
         dialogFragment.show(getSupportFragmentManager(), "AddNoteDialogFragment");
     }
 
-    private void updateCalendarView() {
-        calendarDays.clear();
+    private void populateCalendarDays() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         int month = calendar.get(Calendar.MONTH);
@@ -94,12 +76,24 @@ public class MainActivity extends AppCompatActivity {
 
         ArrayList<Note> notes = (ArrayList<Note>) noteDatabaseHelper.getAllNotes();
         for (Note note : notes) {
-            CalendarDay calendarDay = new CalendarDay(note.getDateInMillis());
-            calendarDay.setNote(note.getTitle());
-            calendarDays.set(calendarDay.getDayOfMonth() - 1, calendarDay);
+            int dayIndex = getDayIndex(note.getDateInMillis());
+            if (dayIndex != -1) {
+                calendarDays.get(dayIndex).setNote(note.getTitle());
+            }
         }
+    }
 
-        CalendarAdapter calendarAdapter = new CalendarAdapter(this, calendarDays);
-        gridView.setAdapter(calendarAdapter);
+    private void updateCalendarDay(Note note) {
+        int dayIndex = getDayIndex(note.getDateInMillis());
+        if (dayIndex != -1) {
+            calendarDays.get(dayIndex).setNote(note.getTitle());
+        }
+    }
+
+    private int getDayIndex(long dateInMillis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dateInMillis);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH) - 1;
+        return (dayOfMonth >= 0 && dayOfMonth < calendarDays.size()) ? dayOfMonth : -1;
     }
 }

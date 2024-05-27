@@ -21,7 +21,9 @@ public class Note {
     }
 
     public void setId(long id) {
-        this.id = id;
+        if (id > 0) {
+            this.id = id;
+        }
     }
 
     public String getTitle() {

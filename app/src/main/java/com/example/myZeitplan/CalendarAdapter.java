@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
 public class CalendarAdapter extends BaseAdapter {
     private Context context;
     private List<CalendarDay> calendarDays;
@@ -62,19 +61,24 @@ public class CalendarAdapter extends BaseAdapter {
         dateTextView.setText(String.valueOf(calendarDay.getDayOfMonth()));
         noteTextView.setText(calendarDay.getNote());
 
-        // Handle day click event
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (onDayClickListener != null) {
                     onDayClickListener.onDayClick(calendarDay);
-
                 }
             }
         });
 
         return convertView;
     }
+
+    // Additional method to update notes and refresh the view
+    public void updateCalendarDays(List<CalendarDay> newCalendarDays) {
+        this.calendarDays = newCalendarDays;
+        notifyDataSetChanged();
+    }
 }
+
 
 
